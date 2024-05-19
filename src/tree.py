@@ -76,7 +76,7 @@ class Node:
             return self.child_node_b.predict(data)
 
 
-class DecisionTreeClassifier(object):
+class DecisionTreeClassifier:
     def __init__(self, max_depth, entropy_func: Callable[[int, int], float]):
         self.depth = 0
         self.max_depth = max_depth
