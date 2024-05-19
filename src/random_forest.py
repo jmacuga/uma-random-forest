@@ -1,11 +1,14 @@
 import numpy as np
 
 
-class RandomForest:
+class RandomForestClassifier:
     def __init__(self, n_trees: int, max_depth: int):
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.trees = []
+
+    def __repr__(self):
+        return f"RandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"
 
     def predict(x: np.array):
         """
@@ -64,9 +67,12 @@ class RandomForest:
         pass
 
 
-class TournamentRandomForest(RandomForest):
+class TournamentRandomForestClassifier(RandomForestClassifier):
     def __init__(self, n_trees: int, max_depth: int):
         super().__init__(n_trees, max_depth)
+
+    def __repr__(self):
+        return f"TournamentRandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"
 
     def _build_tree(X: np.array, y: np.array, depth: int):
         pass
