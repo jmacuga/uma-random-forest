@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 
 class Dataset(ABC):
@@ -19,13 +20,12 @@ class Dataset(ABC):
     def clean(self) -> pd.DataFrame:
         pass
 
-    @abstractmethod
-    def load(self) -> np.array:
-        pass
-
-    @abstractmethod
-    def split_(self) -> tuple[np.array, np.array, np.array, np.array]:
-        pass
+    def split(
+        self, test_size: float, random_state: int = None
+    ) -> tuple[np.array, np.array, np.array, np.array]:
+        return train_test_split(
+            self.data, self.labels, test_size=test_size, random_state=random_state
+        )
 
 
 def Experiment(ABC):
