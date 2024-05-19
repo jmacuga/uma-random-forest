@@ -1,7 +1,9 @@
-from typing import Callable
 import numpy as np
 from utils.tree import entropy_func
 from collections import Counter
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 
 class Group:
@@ -15,16 +17,17 @@ class Group:
         """
         self.group_classes = group_classes
         self.entropy = self.group_entropy()
+        # logging.info(self.__repr__() + " created")
 
     def __len__(self) -> int:
         return self.group_classes.size
 
     def __repr__(self) -> str:
-        return f"Group(group_classes={self.group_classes})"
+        return f"Group(group_classes={self.group_classes}, entropy={self.entropy}"
 
     def group_entropy(self) -> float:
         return sum(
-            self.entropy_func(Counter(self.group_classes)[class_val], len(self.group_classes))
+            entropy_func(Counter(self.group_classes)[class_val], len(self.group_classes))
             for class_val in np.unique(self.group_classes)
         )
 
@@ -62,6 +65,7 @@ class Node:
         self.child_node_a = child_node_a
         self.child_node_b = child_node_b
         self.val = val
+        logging.info(self.__repr__() + " created")
 
     def __repr__(self) -> str:
         return f"Node(split_feature={self.split_feature}, split_val={self.split_val}, depth={self.depth})"
@@ -80,6 +84,7 @@ class DecisionTreeClassifier:
         self.depth = 0
         self.max_depth = max_depth
         self.tree = None
+        logging.info(self.__repr__() + " created")
 
     def __repr__(self) -> str:
         return f"DecisionTreeClassifier(max_depth={self.max_depth})"
@@ -97,6 +102,7 @@ class DecisionTreeClassifier:
         """
         '''
         self.tree = self.build_node(X, y, self.depth)
+        print(self.tree)
 
     def predict(self, X: np.array) -> np.array:
         return self.tree.predict(X)
