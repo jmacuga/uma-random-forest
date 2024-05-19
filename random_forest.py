@@ -1,0 +1,72 @@
+import numpy as np
+
+
+class RandomForest:
+    def __init__(self, n_trees: int, max_depth: int):
+        self.n_trees = n_trees
+        self.max_depth = max_depth
+        self.trees = []
+
+    def predict(x: np.array):
+        """
+        Predict class for input x.
+
+        Parameters
+        ----------
+        x : np.array,
+            The input sample.
+        """
+        pass
+
+    def fit(X: np.array, y: np.array):
+        """
+        Build a forest of trees from the training set (X, y).
+
+        Parameters
+        ----------
+        X : np.array,
+            The training input samples.
+
+        y : np.array,
+            The target values.
+        """
+        pass
+
+    def _bootstrap(X: np.array, y: np.array):
+        """
+        Create a bootstrap sample from the data.
+
+        Parameters
+        ----------
+        X : np.array,
+            The training input samples.
+
+        y : np.array,
+            The target values.
+        """
+        pass
+
+    def _build_tree(X: np.array, y: np.array, depth: int):
+        """
+        Build a tree from the training set (X, y).
+
+        Parameters
+        ----------
+        X : np.array,
+            The training input samples.
+
+        y : np.array,
+            The target values.
+
+        depth : int,
+            The current depth of the tree.
+        """
+        pass
+
+
+class TournamentRandomForest(RandomForest):
+    def __init__(self, n_trees: int, max_depth: int):
+        super().__init__(n_trees, max_depth)
+
+    def _build_tree(X: np.array, y: np.array, depth: int):
+        pass
