@@ -175,20 +175,20 @@ class DecisionTreeClassifier:
             return Node(None, None, depth, val=val)
 
         split_feature, split_val = self.get_best_split(data, classes)
-        indeces_a = data[:, split_feature] <= split_val
-        indeces_b = data[:, split_feature] > split_val
+        indices_a = data[:, split_feature] <= split_val
+        indices_b = data[:, split_feature] > split_val
 
-        if len(indeces_a) == 0 or len(indeces_b) == 0:
+        if np.sum(indices_a) == 0 or np.sum(indices_b) == 0:
             val = Counter(classes).most_common(1)[0][0]
             logging.debug("One group empty -> Leaf - returning: " + str(val))
             return Node(None, None, depth, val=val)
 
         children_nodes = []
 
-        for indeces in [indeces_a, indeces_b]:
+        for indeces in [indices_a, indices_b]:
             child_data = data[indeces]
             child_classes = classes[indeces]
-            logging.debug("Child classes: ")
+            logging.debug(f"Child classes: {child_classes}")
             children_nodes.append(self.build_node(child_data, child_classes, depth + 1))
 
         return Node(
