@@ -3,7 +3,7 @@ from utils.tree import entropy_func
 from collections import Counter
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Group:
@@ -158,7 +158,7 @@ class DecisionTreeClassifier:
         for feature in range(X.shape[1]):
             split_val, information_gain = self.get_best_feature_split(X[:, feature], y)
 
-            if information_gain > max_information_gain:
+            if information_gain >= max_information_gain:
                 max_information_gain = information_gain
                 max_feature = feature
                 best_split_val = split_val
