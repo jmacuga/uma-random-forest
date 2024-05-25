@@ -102,7 +102,7 @@ class DecisionTreeClassifier:
 
         """
         self.tree = self.build_node(X, y, self.depth)
-        print(self.tree)
+        logging.debug(self.tree)
 
     def predict(self, X: np.array) -> np.array:
         return self.tree.predict(X)
@@ -116,8 +116,13 @@ class DecisionTreeClassifier:
 
     @staticmethod
     def get_split_values(feature_values: np.array) -> np.array:
-        print(feature_values)
+        if feature_values.size == 0:
+            raise ValueError("Feature values are empty")
+
+        logging.debug(f"Feature values:")
         sorted_feature_values = np.sort(np.unique(feature_values))
+        if sorted_feature_values.size == 1:
+            return sorted_feature_values
         return [
             np.mean([sorted_feature_values[i], sorted_feature_values[i + 1]])
             for i in range(len(sorted_feature_values) - 1)
@@ -131,8 +136,12 @@ class DecisionTreeClassifier:
     def get_best_feature_split(self, feature_values: np.array, classes: np.array):
         max_information_gain, best_feature_split = 0, None
         split_values = DecisionTreeClassifier.get_split_values(feature_values)
-        print(split_values)
+        logging.debug(f"Split values: {split_values}")
         group_classes = Group(classes)
+
+        if len(split_values) == 1:
+            return split_values[0], 0
+
         for i in range(len(split_values) - 1):
             val = (split_values[i] + split_values[i + 1]) / 2
             group_a = Group(classes[feature_values <= val])
@@ -156,15 +165,22 @@ class DecisionTreeClassifier:
         return max_feature, best_split_val
 
     def build_node(self, data, classes, depth):
+        if data.size == 0 or classes.size == 0:
+            raise ValueError("Data is empty")
+
         if len(np.unique(classes)) == 1 or depth == self.max_depth:
+            logging.debug(f"Most common {Counter(classes).most_common(1)}")
             val = Counter(classes).most_common(1)[0][0]
+            logging.debug("Leaf - returning: " + str(val))
             return Node(None, None, depth, val=val)
+
         split_feature, split_val = self.get_best_split(data, classes)
         indeces_a = data[:, split_feature] <= split_val
         indeces_b = data[:, split_feature] > split_val
 
         if len(indeces_a) == 0 or len(indeces_b) == 0:
             val = Counter(classes).most_common(1)[0][0]
+            logging.debug("One group empty -> Leaf - returning: " + str(val))
             return Node(None, None, depth, val=val)
 
         children_nodes = []
@@ -172,6 +188,7 @@ class DecisionTreeClassifier:
         for indeces in [indeces_a, indeces_b]:
             child_data = data[indeces]
             child_classes = classes[indeces]
+            logging.debug("Child classes: ")
             children_nodes.append(self.build_node(child_data, child_classes, depth + 1))
 
         return Node(
@@ -190,9 +207,11 @@ class RandomizedDecisionTreeClassifier(DecisionTreeClassifier):
 
     def get_best_split(self, X: np.array, y: np.array) -> tuple[int, float]:
         self.feature_indices_ = np.random.choice(X.shape[1], self.max_features, replace=False)
-        print(self.feature_indices_)
+        logging.debug(f"Feature indeces: {self.feature_indices_}")
         X_subset = X[:, self.feature_indices_]
-        return super().get_best_split(X_subset, y)
+        logging.debug(f"X_subset: {X_subset}")
+        split_feature, split_val = super().get_best_split(X_subset, y)
+        return self.feature_indices_[split_feature], split_val
 
 
 class TournamentDecisionTreeClassifier(RandomizedDecisionTreeClassifier):
