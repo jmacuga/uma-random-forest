@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     n_features = round(math.sqrt(X_train.shape[1]))
     # dc = RandomizedDecisionTreeClassifier(3, max_features=n_features)
-    dc = DecisionTreeClassifier(3)
+    dc = DecisionTreeClassifier(10)
 
     start = time.process_time()
     dc.fit(X_train, y_train)
