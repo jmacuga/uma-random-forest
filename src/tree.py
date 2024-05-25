@@ -1,5 +1,6 @@
 import numpy as np
 from utils.tree import entropy_func
+from utils.types import Classifier
 from collections import Counter
 import logging
 
@@ -79,7 +80,7 @@ class Node:
             return self.child_node_b.predict(data)
 
 
-class DecisionTreeClassifier:
+class DecisionTreeClassifier(Classifier):
     def __init__(self, max_depth: int):
         self.depth = 0
         self.max_depth = max_depth
@@ -105,7 +106,10 @@ class DecisionTreeClassifier:
         logging.debug(self.tree)
 
     def predict(self, X: np.array) -> np.array:
-        return self.tree.predict(X)
+        y_pred = []
+        for sample in X:
+            y_pred.append(self.tree.predict(sample))
+        return np.array(y_pred)
 
     @staticmethod
     def get_split_entropy(group_a: Group, group_b: Group) -> float:
