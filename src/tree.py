@@ -3,7 +3,7 @@ from utils.tree import entropy_func
 from collections import Counter
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 class Group:
@@ -17,7 +17,7 @@ class Group:
         """
         self.group_classes = group_classes
         self.entropy = self.group_entropy()
-        # logging.info(self.__repr__() + " created")
+        logging.debug("Group created")
 
     def __len__(self) -> int:
         return self.group_classes.size
