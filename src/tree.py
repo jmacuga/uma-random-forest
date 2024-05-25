@@ -26,10 +26,10 @@ class Group:
         return f"Group(group_classes={self.group_classes}, entropy={self.entropy}"
 
     def group_entropy(self) -> float:
-        return sum(
-            entropy_func(Counter(self.group_classes)[class_val], len(self.group_classes))
-            for class_val in np.unique(self.group_classes)
-        )
+        class_counts = Counter(self.group_classes)
+        total_count = len(self.group_classes)
+        entropy = sum(entropy_func(count, total_count) for count in class_counts.values())
+        return entropy
 
 
 class Node:
@@ -90,7 +90,7 @@ class DecisionTreeClassifier:
         return f"DecisionTreeClassifier(max_depth={self.max_depth})"
 
     def fit(self, X: np.array, y: np.array) -> None:
-        '''Build a tree from the training set (X, y).
+        """Build a tree from the training set (X, y).
 
         Parameters
         ----------
@@ -99,8 +99,8 @@ class DecisionTreeClassifier:
 
         y : np.array,
             The target values.
+
         """
-        '''
         self.tree = self.build_node(X, y, self.depth)
         print(self.tree)
 
@@ -109,26 +109,35 @@ class DecisionTreeClassifier:
 
     @staticmethod
     def get_split_entropy(group_a: Group, group_b: Group) -> float:
-        return sum(group.entropy * (len(group) / (len(group_a) + len(group_b))) for group in [group_a, group_b])
+        total_count = len(group_a) + len(group_b)
+        entropy_a = group_a.entropy * (len(group_a) / total_count)
+        entropy_b = group_b.entropy * (len(group_b) / total_count)
+        return entropy_a + entropy_b
 
-    def get_split_values(self, feature_values: np.array) -> np.array:
-        sorted_feature_values = np.sort(feature_values)
+    @staticmethod
+    def get_split_values(feature_values: np.array) -> np.array:
+        print(feature_values)
+        sorted_feature_values = np.sort(np.unique(feature_values))
         return [
             np.mean([sorted_feature_values[i], sorted_feature_values[i + 1]])
             for i in range(len(sorted_feature_values) - 1)
         ]
 
-    def get_information_gain(self, parent_group, child_group_a, child_group_b):
+    @staticmethod
+    def get_information_gain(parent_group, child_group_a, child_group_b):
         split_entropy = DecisionTreeClassifier.get_split_entropy(child_group_a, child_group_b)
         return parent_group.entropy - split_entropy
 
     def get_best_feature_split(self, feature_values: np.array, classes: np.array):
         max_information_gain, best_feature_split = 0, None
-        split_values = self.get_split_values(feature_values)
-        for val in split_values:
+        split_values = DecisionTreeClassifier.get_split_values(feature_values)
+        print(split_values)
+        group_classes = Group(classes)
+        for i in range(len(split_values) - 1):
+            val = (split_values[i] + split_values[i + 1]) / 2
             group_a = Group(classes[feature_values <= val])
             group_b = Group(classes[feature_values > val])
-            information_gain = self.get_information_gain(Group(classes), group_a, group_b)
+            information_gain = DecisionTreeClassifier.get_information_gain(group_classes, group_a, group_b)
 
             if information_gain > max_information_gain:
                 max_information_gain = information_gain
@@ -174,15 +183,19 @@ class DecisionTreeClassifier:
         )
 
 
-class ID3DecisionTreeClassifier(DecisionTreeClassifier):
-    def __init__(self, max_depth: int):
-        super().__init__(max_depth)
+class RandomizedDecisionTreeClassifier(DecisionTreeClassifier):
+    def __init__(self, max_depth: int, max_features: int = None):
+        super().__init__(max_depth=max_depth)
+        self.max_features = max_features
 
-    def __repr__(self):
-        return f"ID3DecisionTreeClassifier(max_depth={self.max_depth})"
+    def get_best_split(self, X: np.array, y: np.array) -> tuple[int, float]:
+        self.feature_indices_ = np.random.choice(X.shape[1], self.max_features, replace=False)
+        print(self.feature_indices_)
+        X_subset = X[:, self.feature_indices_]
+        return super().get_best_split(X_subset, y)
 
 
-class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
+class TournamentDecisionTreeClassifier(RandomizedDecisionTreeClassifier):
     def __init__(self, max_depth: int):
         super().__init__(max_depth)
 
