@@ -153,7 +153,7 @@ class DecisionTreeClassifier:
                 best_feature_split = val
         return best_feature_split, max_information_gain
 
-    def get_best_split(self, X: np.array, y: np.array) -> tuple[int, float]:
+    def get_best_split(self, X: np.array, y: np.array) -> 'tuple[int, float]':
         max_information_gain, max_feature, best_split_val = 0, None, None
         for feature in range(X.shape[1]):
             split_val, information_gain = self.get_best_feature_split(X[:, feature], y)
@@ -205,7 +205,7 @@ class RandomizedDecisionTreeClassifier(DecisionTreeClassifier):
         super().__init__(max_depth=max_depth)
         self.max_features = max_features
 
-    def get_best_split(self, X: np.array, y: np.array) -> tuple[int, float]:
+    def get_best_split(self, X: np.array, y: np.array) -> 'tuple[int, float]':
         self.feature_indices_ = np.random.choice(X.shape[1], self.max_features, replace=False)
         logging.debug(f"Feature indeces: {self.feature_indices_}")
         X_subset = X[:, self.feature_indices_]

@@ -22,7 +22,7 @@ class Dataset(ABC):
 
     def split(
         self, test_size: float, random_state: int = None
-    ) -> tuple[np.array, np.array, np.array, np.array]:
+    ) -> 'tuple[np.array, np.array, np.array, np.array]':
         return train_test_split(
             self.data, self.labels, test_size=test_size, random_state=random_state
         )
