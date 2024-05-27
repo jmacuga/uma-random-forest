@@ -1,12 +1,13 @@
 import numpy as np
-from tree import DecisionTreeClassifier, TournamentDecisionTreeClassifier
+from tree import RandomizedDecisionTreeClassifier, RandomizedTournamentDecisionTreeClassifier
 
 
 class RandomForestClassifier:
-    def __init__(self, n_trees: int, max_depth: int):
+    def __init__(self, n_trees: int, max_depth: int, max_features: int = None):
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.trees = []
+        self.max_features = max_features
 
     def __repr__(self):
         return f"RandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"
@@ -28,7 +29,7 @@ class RandomForestClassifier:
             else:
                 prediction_table[prediction] = 1
         return max(prediction_table)
-                
+
     def fit(self, X: np.array, y: np.array):
         """
         Build a forest of trees from the training set (X, y).
@@ -60,7 +61,7 @@ class RandomForestClassifier:
         # bootstrap_indexes = np.random.choice(len(X), len(X))
         # bootstrap_X = np.array([X[i] for i in bootstrap_indexes])
         # bootstrap_y = np.array([y[i] for i in bootstrap_indexes])
-    
+
         bootstrap_indexes = np.random.choice(len(X), len(X))
         bootstrap_X = []
         bootstrap_y = []
@@ -86,18 +87,22 @@ class RandomForestClassifier:
         depth : int,
             The current depth of the tree.
         """
-        dc = DecisionTreeClassifier(depth)
+        dc = RandomizedDecisionTreeClassifier(depth, max_features=self.max_features)
         dc.fit(X, y)
         self.trees.append(dc)
 
+
 class TournamentRandomForestClassifier(RandomForestClassifier):
-    def __init__(self, n_trees: int, max_depth: int):
-        super().__init__(n_trees, max_depth)
+    def __init__(self, n_trees: int, max_depth: int, tournament_size: int = 2, max_features: int = None):
+        super().__init__(n_trees, max_depth, max_features)
+        self.tournament_size = tournament_size
 
     def __repr__(self):
         return f"TournamentRandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"
 
     def _build_tree(self, X: np.array, y: np.array, depth: int):
-        dc = TournamentDecisionTreeClassifier(depth)
+        dc = RandomizedTournamentDecisionTreeClassifier(
+            depth, max_features=self.max_features, tournament_size=self.tournament_size
+        )
         dc.fit(X, y)
         self.trees.append(dc)

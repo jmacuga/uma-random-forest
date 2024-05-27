@@ -4,6 +4,19 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
+class Classifier(ABC):
+    def __init__(self):
+        raise NotImplementedError("Method not implemented")
+
+    @abstractmethod
+    def fit(self, X: np.array, y: np.array):
+        raise NotImplementedError("Method fit not implemented")
+
+    @abstractmethod
+    def predict(self, X: np.array) -> np.array:
+        raise NotImplementedError("Method predict not implemented")
+
+
 class Dataset(ABC):
     def __init__(self, path: str = None):
         self.path = path
@@ -20,40 +33,5 @@ class Dataset(ABC):
     def clean(self) -> pd.DataFrame:
         pass
 
-    def split(
-        self, test_size: float, random_state: int = None
-    ) -> 'tuple[np.array, np.array, np.array, np.array]':
-        return train_test_split(
-            self.data, self.labels, test_size=test_size, random_state=random_state
-        )
-
-
-def Experiment(ABC):
-    def __init__(self, dataset: Dataset):
-        self.dataset = dataset
-        self.data = dataset.data
-        self.labels = dataset.labels
-
-    @abstractmethod
-    def run(self):
-        pass
-
-    @abstractmethod
-    def evaluate(self):
-        pass
-
-    @abstractmethod
-    def plot(self):
-        pass
-
-    @abstractmethod
-    def save(self):
-        pass
-
-    @abstractmethod
-    def load(self):
-        pass
-
-    @abstractmethod
-    def clean(self):
-        pass
+    def split(self, test_size: float, random_state: int = None) -> tuple[np.array, np.array, np.array, np.array]:
+        return train_test_split(self.data, self.labels, test_size=test_size, random_state=random_state)

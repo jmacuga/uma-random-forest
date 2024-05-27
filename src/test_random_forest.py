@@ -1,5 +1,6 @@
 from datasets.mushrooms import MushroomDataset
-from random_forest import TournamentRandomForestClassifier
+from tree import DecisionTreeClassifier
+from random_forest import RandomForestClassifier, TournamentRandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score
 import math, time
 
@@ -15,19 +16,17 @@ if __name__ == "__main__":
     print(len(y_train))
     print(y_train.shape)
 
-    print("Tournament random forest\n")
-
     n_features = round(math.sqrt(X_train.shape[1]))
     print(f"n_features: {n_features}")
 
-    trf = TournamentRandomForestClassifier(n_trees=10, max_depth=3, tournament_size=2, max_features=n_features)
-    trf.fit(X_train, y_train)
+    rf = RandomForestClassifier(n_trees=10, max_depth=3, max_features=n_features)
+    rf.fit(X_train, y_train)
 
     start = time.process_time()
 
     print(f"Time: {time.process_time() - start}s")
 
-    y_preds = [trf.predict(x) for x in X_val]
+    y_preds = [rf.predict(x) for x in X_val]
 
     accuracy = accuracy_score(y_val, y_preds)
     confusion_matrix = confusion_matrix(y_val, y_preds)
