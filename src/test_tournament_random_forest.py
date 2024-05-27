@@ -20,7 +20,7 @@ if __name__ == "__main__":
     n_features = round(math.sqrt(X_train.shape[1]))
     print(f"n_features: {n_features}")
 
-    trf = TournamentRandomForestClassifier(n_trees=10, max_depth=3, tournament_size=2, max_features=n_features)
+    trf = TournamentRandomForestClassifier(n_trees=100, max_depth=4, tournament_size=3, max_features=n_features)
     trf.fit(X_train, y_train)
 
     start = time.process_time()
