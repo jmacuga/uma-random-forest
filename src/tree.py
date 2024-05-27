@@ -105,11 +105,8 @@ class DecisionTreeClassifier(Classifier):
         self.tree = self.build_node(X, y, self.depth)
         logging.debug(self.tree)
 
-    def predict(self, X: np.array) -> np.array:
-        y_pred = []
-        for sample in X:
-            y_pred.append(self.tree.predict(sample))
-        return np.array(y_pred)
+    def predict(self, sample: np.array) -> np.array:
+        return self.tree.predict(sample)
 
     @staticmethod
     def get_split_entropy(group_a: Group, group_b: Group) -> float:
@@ -252,13 +249,17 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
         return int(all_splits[best_split_id][0]), all_splits[best_split_id][1]
 
     def __repr__(self):
-        return f"TournamentDecisionTreeClassifier(max_depth={self.max_depth})"
+        return f"TournamentDecisionTreeClassifier(max_depth={self.max_depth}, tournament_size={self.tournament_size})"
 
 
 class RandomizedTournamentDecisionTreeClassifier(TournamentDecisionTreeClassifier):
     def __init__(self, max_depth: int, tournament_size: int = 2, max_features: int = None):
         super().__init__(max_depth=max_depth, tournament_size=tournament_size)
+        print(f"self.tournament sieze: {self.tournament_size}")
         self.max_features = max_features
+
+    def __repr__(self):
+        return f"TournamentDecisionTreeClassifier(max_depth={self.max_depth})"
 
     def get_best_split(self, X: np.array, y: np.array) -> "tuple[int, float]":
         self.feature_indices_ = np.random.choice(X.shape[1], self.max_features, replace=False)
