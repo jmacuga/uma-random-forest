@@ -3,7 +3,7 @@ from utils.tree import entropy_func
 from collections import Counter
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Group:
@@ -26,10 +26,10 @@ class Group:
         return f"Group(group_classes={self.group_classes}, entropy={self.entropy}"
 
     def group_entropy(self) -> float:
-        return sum(
-            entropy_func(Counter(self.group_classes)[class_val], len(self.group_classes))
-            for class_val in np.unique(self.group_classes)
-        )
+        class_counts = Counter(self.group_classes)
+        total_count = len(self.group_classes)
+        entropy = sum(entropy_func(count, total_count) for count in class_counts.values())
+        return entropy
 
 
 class Node:
@@ -90,7 +90,7 @@ class DecisionTreeClassifier:
         return f"DecisionTreeClassifier(max_depth={self.max_depth})"
 
     def fit(self, X: np.array, y: np.array) -> None:
-        '''Build a tree from the training set (X, y).
+        """Build a tree from the training set (X, y).
 
         Parameters
         ----------
@@ -99,70 +99,96 @@ class DecisionTreeClassifier:
 
         y : np.array,
             The target values.
+
         """
-        '''
         self.tree = self.build_node(X, y, self.depth)
-        print(self.tree)
+        logging.debug(self.tree)
 
     def predict(self, X: np.array) -> np.array:
         return self.tree.predict(X)
 
     @staticmethod
     def get_split_entropy(group_a: Group, group_b: Group) -> float:
-        return sum(group.entropy * (len(group) / (len(group_a) + len(group_b))) for group in [group_a, group_b])
+        total_count = len(group_a) + len(group_b)
+        entropy_a = group_a.entropy * (len(group_a) / total_count)
+        entropy_b = group_b.entropy * (len(group_b) / total_count)
+        return entropy_a + entropy_b
 
-    def get_split_values(self, feature_values: np.array) -> np.array:
-        sorted_feature_values = np.sort(feature_values)
+    @staticmethod
+    def get_split_values(feature_values: np.array) -> np.array:
+        if feature_values.size == 0:
+            raise ValueError("Feature values are empty")
+
+        logging.debug(f"Feature values:")
+        sorted_feature_values = np.sort(np.unique(feature_values))
+        if sorted_feature_values.size == 1:
+            return sorted_feature_values
         return [
             np.mean([sorted_feature_values[i], sorted_feature_values[i + 1]])
             for i in range(len(sorted_feature_values) - 1)
         ]
 
-    def get_information_gain(self, parent_group, child_group_a, child_group_b):
+    @staticmethod
+    def get_information_gain(parent_group, child_group_a, child_group_b):
         split_entropy = DecisionTreeClassifier.get_split_entropy(child_group_a, child_group_b)
         return parent_group.entropy - split_entropy
 
     def get_best_feature_split(self, feature_values: np.array, classes: np.array):
         max_information_gain, best_feature_split = 0, None
-        split_values = self.get_split_values(feature_values)
-        for val in split_values:
+        split_values = DecisionTreeClassifier.get_split_values(feature_values)
+        logging.debug(f"Split values: {split_values}")
+        group_classes = Group(classes)
+
+        if len(split_values) == 1:
+            return split_values[0], 0
+
+        for i in range(len(split_values) - 1):
+            val = (split_values[i] + split_values[i + 1]) / 2
             group_a = Group(classes[feature_values <= val])
             group_b = Group(classes[feature_values > val])
-            information_gain = self.get_information_gain(Group(classes), group_a, group_b)
+            information_gain = DecisionTreeClassifier.get_information_gain(group_classes, group_a, group_b)
 
             if information_gain > max_information_gain:
                 max_information_gain = information_gain
                 best_feature_split = val
         return best_feature_split, max_information_gain
 
-    def get_best_split(self, X: np.array, y: np.array) -> tuple[int, float]:
+    def get_best_split(self, X: np.array, y: np.array) -> 'tuple[int, float]':
         max_information_gain, max_feature, best_split_val = 0, None, None
         for feature in range(X.shape[1]):
             split_val, information_gain = self.get_best_feature_split(X[:, feature], y)
 
-            if information_gain > max_information_gain:
+            if information_gain >= max_information_gain:
                 max_information_gain = information_gain
                 max_feature = feature
                 best_split_val = split_val
         return max_feature, best_split_val
 
     def build_node(self, data, classes, depth):
-        if len(np.unique(classes)) == 1 or depth == self.max_depth:
-            val = Counter(classes).most_common(1)[0][0]
-            return Node(None, None, depth, val=val)
-        split_feature, split_val = self.get_best_split(data, classes)
-        indeces_a = data[:, split_feature] <= split_val
-        indeces_b = data[:, split_feature] > split_val
+        if data.size == 0 or classes.size == 0:
+            raise ValueError("Data is empty")
 
-        if len(indeces_a) == 0 or len(indeces_b) == 0:
+        if len(np.unique(classes)) == 1 or depth == self.max_depth:
+            logging.debug(f"Most common {Counter(classes).most_common(1)}")
             val = Counter(classes).most_common(1)[0][0]
+            logging.debug("Leaf - returning: " + str(val))
+            return Node(None, None, depth, val=val)
+
+        split_feature, split_val = self.get_best_split(data, classes)
+        indices_a = data[:, split_feature] <= split_val
+        indices_b = data[:, split_feature] > split_val
+
+        if np.sum(indices_a) == 0 or np.sum(indices_b) == 0:
+            val = Counter(classes).most_common(1)[0][0]
+            logging.debug("One group empty -> Leaf - returning: " + str(val))
             return Node(None, None, depth, val=val)
 
         children_nodes = []
 
-        for indeces in [indeces_a, indeces_b]:
+        for indeces in [indices_a, indices_b]:
             child_data = data[indeces]
             child_classes = classes[indeces]
+            logging.debug(f"Child classes: {child_classes}")
             children_nodes.append(self.build_node(child_data, child_classes, depth + 1))
 
         return Node(
@@ -174,15 +200,21 @@ class DecisionTreeClassifier:
         )
 
 
-class ID3DecisionTreeClassifier(DecisionTreeClassifier):
-    def __init__(self, max_depth: int):
-        super().__init__(max_depth)
+class RandomizedDecisionTreeClassifier(DecisionTreeClassifier):
+    def __init__(self, max_depth: int, max_features: int = None):
+        super().__init__(max_depth=max_depth)
+        self.max_features = max_features
 
-    def __repr__(self):
-        return f"ID3DecisionTreeClassifier(max_depth={self.max_depth})"
+    def get_best_split(self, X: np.array, y: np.array) -> 'tuple[int, float]':
+        self.feature_indices_ = np.random.choice(X.shape[1], self.max_features, replace=False)
+        logging.debug(f"Feature indeces: {self.feature_indices_}")
+        X_subset = X[:, self.feature_indices_]
+        logging.debug(f"X_subset: {X_subset}")
+        split_feature, split_val = super().get_best_split(X_subset, y)
+        return self.feature_indices_[split_feature], split_val
 
 
-class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
+class TournamentDecisionTreeClassifier(RandomizedDecisionTreeClassifier):
     def __init__(self, max_depth: int):
         super().__init__(max_depth)
 
