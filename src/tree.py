@@ -4,7 +4,7 @@ from utils.types import Classifier
 from collections import Counter
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 
 
 class Group:
@@ -229,7 +229,11 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
         all_splits = np.array(all_splits)
 
         # Select random splits for tournament
-        tournament_splits = np.random.choice(all_splits.shape[0], self.tournament_size, replace=False)
+        if all_splits.shape[0] <= self.tournament_size:
+            tournament_splits = np.arange(all_splits.shape[0])
+        else:
+            tournament_splits = np.random.choice(all_splits.shape[0], self.tournament_size, replace=False)
+        
         logging.debug(f"tournament_splits: {tournament_splits}")
         inf_gains = []
         for split in tournament_splits:
@@ -255,7 +259,6 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
 class RandomizedTournamentDecisionTreeClassifier(TournamentDecisionTreeClassifier):
     def __init__(self, max_depth: int, tournament_size: int = 2, max_features: int = None):
         super().__init__(max_depth=max_depth, tournament_size=tournament_size)
-        print(f"self.tournament sieze: {self.tournament_size}")
         self.max_features = max_features
 
     def __repr__(self):
