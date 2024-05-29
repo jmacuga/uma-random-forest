@@ -1,1 +1,57 @@
+import numpy as np
+from itertools import product
+from .types import Classifier
 
+
+def grid_search(
+    param_grid: dict,
+    model_class: Classifier,
+    X_train: np.array,
+    X_test: np.array,
+    y_train: np.array,
+    y_test: np.array,
+    score_func: callable,
+) -> dict:
+    """
+    Perform grid search on a random forest model.
+
+    Parameters
+    ----------
+    param_grid : dict
+        Dictionary with hyperparameters to search.
+    model : RandomForestClassifier
+        Random forest model to use.
+    X_train : np.array
+        Training data.
+    X_test : np.array
+        Testing data.
+    y_train : np.array
+        Training labels.
+    y_test : np.array
+        Testing labels.
+    score : callable
+        Scoring function.
+
+    Returns
+    -------
+    dict
+        Best hyperparameters found.
+    """
+    param_combinations = list(product(*param_grid.values()))
+    param_names = list(param_grid.keys())
+
+    # Perform grid search
+    best_params = None
+    best_score = 0
+
+    for params in param_combinations:
+        param_dict = dict(zip(param_names, params))
+        model = model_class(**param_dict)
+        model.fit(X_train, y_train)
+        y_pred = np.array([model.predict(x) for x in X_test])
+        score = score_func(y_test, y_pred)
+
+        if score > best_score:
+            best_score = score
+            best_params = param_dict
+    return best_params, best_score
