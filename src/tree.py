@@ -120,7 +120,7 @@ class DecisionTreeClassifier(Classifier):
         if feature_values.size == 0:
             raise ValueError("Feature values are empty")
 
-        logging.debug(f"Feature values:")
+        logging.debug(f"Feature values: ")
         sorted_feature_values = np.sort(np.unique(feature_values))
         if sorted_feature_values.size == 1:
             return sorted_feature_values
@@ -142,24 +142,21 @@ class DecisionTreeClassifier(Classifier):
         logging.debug(f"Split values: {split_values}")
         group_classes = Group(classes)
 
-        if len(split_values) == 1:
-            return split_values[0], 0
-
-        for i in range(len(split_values) - 1):
-            val = (split_values[i] + split_values[i + 1]) / 2
-            group_a = Group(classes[feature_values <= val])
-            group_b = Group(classes[feature_values > val])
+        for split_val in split_values:
+            group_a = Group(classes[feature_values <= split_val])
+            group_b = Group(classes[feature_values > split_val])
             information_gain = DecisionTreeClassifier.get_information_gain(group_classes, group_a, group_b)
 
-            if information_gain > max_information_gain:
+            if information_gain >= max_information_gain:
                 max_information_gain = information_gain
-                best_feature_split = val
+                best_feature_split = split_val
         return best_feature_split, max_information_gain
 
     def get_best_split(self, X: np.array, y: np.array) -> "tuple[int, float]":
         max_information_gain, max_feature, best_split_val = 0, None, None
         for feature in range(X.shape[1]):
             split_val, information_gain = self.get_best_feature_split(X[:, feature], y)
+            logging.debug(f"feature {feature} Information gain: {information_gain}")
 
             if information_gain >= max_information_gain:
                 max_information_gain = information_gain
@@ -233,7 +230,7 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
             tournament_splits = np.arange(all_splits.shape[0])
         else:
             tournament_splits = np.random.choice(all_splits.shape[0], self.tournament_size, replace=False)
-        
+
         logging.debug(f"tournament_splits: {tournament_splits}")
         inf_gains = []
         for split in tournament_splits:
