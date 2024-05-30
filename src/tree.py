@@ -250,7 +250,7 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
         return int(all_splits[best_split_id][0]), all_splits[best_split_id][1]
 
     def __repr__(self):
-        return f"TournamentDecisionTreeClassifier(max_depth={self.max_depth}, tournament_size={self.tournament_size})"
+        return f"TournamentDecisionTreeClassifier(max_depth={self.max_depth})"
 
 
 class RandomizedTournamentDecisionTreeClassifier(TournamentDecisionTreeClassifier):
