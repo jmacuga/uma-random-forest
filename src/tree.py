@@ -201,7 +201,7 @@ class DecisionTreeClassifier(Classifier):
 
 
 class RandomizedDecisionTreeClassifier(DecisionTreeClassifier):
-    def __init__(self, max_depth: int, max_features: int = None):
+    def __init__(self, max_depth: int, max_features: int):
         super().__init__(max_depth=max_depth)
         self.max_features = max_features
 
