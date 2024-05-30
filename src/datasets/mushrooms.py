@@ -25,13 +25,14 @@ class MushroomDataset(Dataset):
         return f"ShroomsDataset() with {len(self)} samples"
 
     def to_numerical(self):
-        for i, col in enumerate(self.data.columns):
-            self.data.iloc[:, i], unique = pd.factorize(self.data.iloc[:, i])
-            self.features_map[i] = unique
+        for col in self.data.columns:
+            dummies = pd.get_dummies(self.data[col], prefix=col)
+            self.data = pd.concat([self.data.drop(col, axis=1), dummies], axis=1)
+            self.features_map[col] = dummies.columns
 
         self.labels, self.classes_map = pd.factorize(self.labels)
 
     def clean(self) -> None:
         self.to_numerical()
-        self.data = np.array(self.data)
-        self.labels = np.array(self.labels)
+        self.data = np.array(self.data, dtype=int)
+        self.labels = np.array(self.labels, dtype=int)
