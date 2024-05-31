@@ -56,9 +56,9 @@ def grid_search(
             y_pred = np.array([model.predict(x) for x in X_test])
 
             accuracy = accuracy_score(y_test, y_pred)
-            precision = precision_score(y_test, y_pred)
-            recall = recall_score(y_test, y_pred)
-            f1 = f1_score(y_test, y_pred)
+            precision = precision_score(y_test, y_pred, average="macro")
+            recall = recall_score(y_test, y_pred, average="macro")
+            f1 = f1_score(y_test, y_pred, average="macro")
             accuracy_arr.append(accuracy)
             precision_arr.append(precision)
             recall_arr.append(recall)
