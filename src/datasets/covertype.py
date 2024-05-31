@@ -20,7 +20,7 @@ class CovertypeDataset(Dataset):
 
         self.features_map = {}
         self.classes_map = {}
-        self.labels = (
+        self.labels_names = (
             "Spruce/Fir",
             "Lodgepole Pine",
             "Ponderosa Pine",
@@ -34,4 +34,5 @@ class CovertypeDataset(Dataset):
         return f"CovertypeDataset with {len(self)} samples"
 
     def clean(self) -> None:
-        pass
+        self.data = np.array(self.data)
+        self.labels = np.array(self.labels)

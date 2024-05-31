@@ -4,7 +4,7 @@ from utils.types import Classifier
 from collections import Counter
 import logging
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 
 
 class Group:
