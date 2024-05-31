@@ -1,4 +1,5 @@
 from datasets.mushrooms import MushroomDataset
+from datasets.breast_cancer import BreastCancerDataset
 from random_forest import TournamentRandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score
 import math, time

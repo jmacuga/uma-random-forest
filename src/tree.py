@@ -219,7 +219,7 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
         super().__init__(max_depth)
         self.tournament_size = tournament_size
 
-    def get_best_split(self, X: np.array, y: np.array) -> tuple[int, float]:
+    def get_best_split(self, X: np.array, y: np.array) -> "tuple[int, float]":
         all_splits = []
         for feature in range(X.shape[1]):
             all_splits.extend([(feature, split) for split in self.get_split_values(X[:, feature])])
