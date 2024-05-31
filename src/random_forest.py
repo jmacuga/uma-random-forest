@@ -1,6 +1,6 @@
 import numpy as np
 from tree import RandomizedDecisionTreeClassifier, RandomizedTournamentDecisionTreeClassifier
-
+from tqdm import tqdm
 
 class RandomForestClassifier:
     def __init__(self, n_trees: int, max_depth: int, max_features: int = None):
@@ -65,7 +65,7 @@ class RandomForestClassifier:
         bootstrap_indexes = np.random.choice(len(X), len(X))
         bootstrap_X = []
         bootstrap_y = []
-        for i in bootstrap_indexes:
+        for i in tqdm(bootstrap_indexes):
             bootstrap_X.append(X[i])
             bootstrap_y.append(y[i])
         bootstrap_X = np.array(bootstrap_X)
