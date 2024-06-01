@@ -13,7 +13,7 @@ def grid_search(
     y_train: np.array,
     y_test: np.array,
     num_calls: int,
-    path: str,
+    path: str = None,
 ) -> dict:
     """
     Perform grid search on a random forest model.
