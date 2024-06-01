@@ -3,11 +3,12 @@ from tree import RandomizedDecisionTreeClassifier, RandomizedTournamentDecisionT
 
 
 class RandomForestClassifier:
-    def __init__(self, n_trees: int, max_depth: int, max_features: int = None):
+    def __init__(self, n_trees: int, max_depth: int, max_features: int = None, max_split_values: int = None):
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.trees = []
         self.max_features = max_features
+        self.max_split_values = max_split_values
 
     def __repr__(self):
         return f"RandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"
@@ -87,13 +88,21 @@ class RandomForestClassifier:
         depth : int,
             The current depth of the tree.
         """
-        dc = RandomizedDecisionTreeClassifier(depth, max_features=self.max_features)
+        dc = RandomizedDecisionTreeClassifier(
+            depth, max_features=self.max_features, max_split_values=self.max_split_values
+        )
         dc.fit(X, y)
         self.trees.append(dc)
 
 
 class TournamentRandomForestClassifier(RandomForestClassifier):
-    def __init__(self, n_trees: int, max_depth: int, tournament_size: int = 2, max_features: int = None):
+    def __init__(
+        self,
+        n_trees: int,
+        max_depth: int,
+        tournament_size: int = 2,
+        max_features: int = None,
+    ):
         super().__init__(n_trees, max_depth, max_features)
         self.tournament_size = tournament_size
 
@@ -102,7 +111,9 @@ class TournamentRandomForestClassifier(RandomForestClassifier):
 
     def _build_tree(self, X: np.array, y: np.array, depth: int):
         dc = RandomizedTournamentDecisionTreeClassifier(
-            depth, max_features=self.max_features, tournament_size=self.tournament_size
+            depth,
+            max_features=self.max_features,
+            tournament_size=self.tournament_size,
         )
         dc.fit(X, y)
         self.trees.append(dc)
