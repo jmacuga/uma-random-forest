@@ -7,3 +7,4 @@ IPython==8.24.0
 ucimlrepo==0.0.6
 certifi==2024.2.2
 tqdm==4.66.4
+notebook==7.2.0
