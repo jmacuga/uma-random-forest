@@ -3,7 +3,7 @@ from itertools import product
 from .types import Classifier
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
-
+import pandas as pd
 
 def grid_search(
     param_grid: dict,
@@ -13,6 +13,7 @@ def grid_search(
     y_train: np.array,
     y_test: np.array,
     num_calls: int,
+    path: str,
 ) -> dict:
     """
     Perform grid search on a random forest model.
@@ -75,8 +76,26 @@ def grid_search(
         result["recall"] = recall
         result["f1"] = f1
         results.append(result)
+        if path is not None:
+            save_results(results, path)
 
         if accuracy > best_accuracy:
             best_accuracy = accuracy
             best_params = param_dict
     return best_params, best_accuracy, results
+
+
+def save_results(results: dict, path: str):
+    """
+    Append results to a CSV file.
+
+    Parameters
+    ----------
+    results : dict
+        Results dictionary.
+    path : str
+        Path to save the CSV file.
+    """
+    df = pd.DataFrame(results)
+    df.to_csv(path, mode='a', index=False)
+    return df
