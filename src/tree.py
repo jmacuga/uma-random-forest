@@ -4,7 +4,7 @@ from utils.types import Classifier
 from collections import Counter
 import logging
 
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 
 
 class Group:
@@ -18,7 +18,7 @@ class Group:
         """
         self.group_classes = group_classes
         self.entropy = self.group_entropy()
-        logging.debug("Group created")
+        logging.debug(f"Group created, entropy: {self.entropy}")
 
     def __len__(self) -> int:
         return self.group_classes.size
@@ -81,10 +81,11 @@ class Node:
 
 
 class DecisionTreeClassifier(Classifier):
-    def __init__(self, max_depth: int):
+    def __init__(self, max_depth: int, max_split_values: int = None):
         self.depth = 0
         self.max_depth = max_depth
         self.tree = None
+        self.max_split_values = max_split_values
         logging.info(self.__repr__() + " created")
 
     def __repr__(self) -> str:
@@ -124,12 +125,15 @@ class DecisionTreeClassifier(Classifier):
         sorted_feature_values = np.sort(np.unique(feature_values))
         if sorted_feature_values.size == 1:
             return sorted_feature_values
-        return np.array(
+
+        split_values = np.array(
             [
                 np.mean([sorted_feature_values[i], sorted_feature_values[i + 1]])
                 for i in range(len(sorted_feature_values) - 1)
             ]
         )
+        split_values = split_values[~np.isnan(split_values)]
+        return split_values
 
     @staticmethod
     def get_information_gain(parent_group, child_group_a, child_group_b):
@@ -139,7 +143,12 @@ class DecisionTreeClassifier(Classifier):
     def get_best_feature_split(self, feature_values: np.array, classes: np.array):
         max_information_gain, best_feature_split = 0, None
         split_values = DecisionTreeClassifier.get_split_values(feature_values)
+
+        if self.max_split_values is not None and len(split_values) > self.max_split_values:
+            split_values = np.random.choice(split_values, self.max_split_values, replace=False)
+            
         logging.debug(f"Split values: {split_values}")
+        logging.debug(f"Classes.shape: {classes.shape}")
         group_classes = Group(classes)
 
         for split_val in split_values:
@@ -201,8 +210,8 @@ class DecisionTreeClassifier(Classifier):
 
 
 class RandomizedDecisionTreeClassifier(DecisionTreeClassifier):
-    def __init__(self, max_depth: int, max_features: int):
-        super().__init__(max_depth=max_depth)
+    def __init__(self, max_depth: int, max_features: int, max_split_values: int = None):
+        super().__init__(max_depth=max_depth, max_split_values=max_split_values)
         self.max_features = max_features
 
     def get_best_split(self, X: np.array, y: np.array) -> "tuple[int, float]":
