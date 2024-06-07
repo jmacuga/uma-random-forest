@@ -82,6 +82,9 @@ def grid_search(
         if accuracy > best_accuracy:
             best_accuracy = accuracy
             best_params = param_dict
+
+    # if path is not None:
+        # save_results(results, path)
     return best_params, best_accuracy, results
 
 

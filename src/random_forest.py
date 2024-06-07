@@ -32,7 +32,7 @@ class RandomForestClassifier:
                 prediction_table[prediction] += 1
             else:
                 prediction_table[prediction] = 1
-        return max(prediction_table)
+        return max(prediction_table, key=prediction_table.get)
 
     def fit(self, X: np.array, y: np.array):
         """
@@ -105,11 +105,11 @@ class TournamentRandomForestClassifier(RandomForestClassifier):
         max_depth: int,
         tournament_size: int = 2,
         max_features: int = None,
+        max_split_values: int = None
     ):
-        super().__init__(n_trees, max_depth, max_features)
+        super().__init__(n_trees, max_depth, max_features, max_split_values)
         self.tournament_size = tournament_size
         logging.info(f"TournamentRandomForestClassifier: n_trees={n_trees}, max_depth={max_depth}, tournament_size={tournament_size}")
-
 
     def __repr__(self):
         return f"TournamentRandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"

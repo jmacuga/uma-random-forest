@@ -6,7 +6,7 @@ from ucimlrepo import fetch_ucirepo
 
 
 class MushroomDataset(Dataset):
-    def __init__(self, id: int = 73, path: str = None):
+    def __init__(self, id: int = 73, path: str = None, label_id: int = 0):
         super().__init__()
         if path is None:
             mushroom = fetch_ucirepo(id=id)
@@ -14,8 +14,8 @@ class MushroomDataset(Dataset):
             self.labels = mushroom.data.targets.iloc[:, 0]
         else:
             mushrooms = pd.read_csv(path, header=None)
-            self.data = mushrooms.iloc[:, 1:]
-            self.labels = mushrooms.iloc[:, 0]
+            self.data = mushrooms.iloc[:, label_id+1:]
+            self.labels = mushrooms.iloc[:, label_id]
 
         self.features_map = {}
         self.classes_map = {}
