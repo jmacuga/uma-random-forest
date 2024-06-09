@@ -4,6 +4,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+
 class RandomForestClassifier:
     def __init__(self, n_trees: int, max_depth: int, max_features: int = None, max_split_values: int = None):
         self.n_trees = n_trees
@@ -32,8 +33,7 @@ class RandomForestClassifier:
                 prediction_table[prediction] += 1
             else:
                 prediction_table[prediction] = 1
-        a = max(prediction_table, key=prediction_table.get)
-        return a
+        return max(prediction_table, key=prediction_table.get)
 
     def fit(self, X: np.array, y: np.array):
         """
@@ -109,7 +109,9 @@ class TournamentRandomForestClassifier(RandomForestClassifier):
     ):
         super().__init__(n_trees, max_depth, max_features)
         self.tournament_size = tournament_size
-        logging.info(f"TournamentRandomForestClassifier: n_trees={n_trees}, max_depth={max_depth}, tournament_size={tournament_size}")
+        logging.info(
+            f"TournamentRandomForestClassifier: n_trees={n_trees}, max_depth={max_depth}, tournament_size={tournament_size}"
+        )
 
     def __repr__(self):
         return f"TournamentRandomForestClassifier(n_trees={self.n_trees}, max_depth={self.max_depth})"
