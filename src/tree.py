@@ -24,7 +24,7 @@ class Group:
         return self.group_classes.size
 
     def __repr__(self) -> str:
-        return f"Group(group_classes={self.group_classes}, entropy={self.entropy}"
+        return f"Group(group_classes=, entropy={self.entropy}"
 
     def group_entropy(self) -> float:
         class_counts = Counter(self.group_classes)
@@ -146,7 +146,7 @@ class DecisionTreeClassifier(Classifier):
 
         if self.max_split_values is not None and len(split_values) > self.max_split_values:
             split_values = np.random.choice(split_values, self.max_split_values, replace=False)
-            
+
         logging.debug(f"Split values: {split_values}")
         logging.debug(f"Classes.shape: {classes.shape}")
         group_classes = Group(classes)
@@ -238,7 +238,7 @@ class TournamentDecisionTreeClassifier(DecisionTreeClassifier):
         if all_splits.shape[0] <= self.tournament_size:
             tournament_splits = np.arange(all_splits.shape[0])
         else:
-            tournament_splits = np.random.choice(all_splits.shape[0], self.tournament_size, replace=False)
+            tournament_splits = np.random.choice(all_splits.shape[0], self.tournament_size)
 
         logging.debug(f"tournament_splits: {tournament_splits}")
         inf_gains = []
