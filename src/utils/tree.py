@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import math
 
 

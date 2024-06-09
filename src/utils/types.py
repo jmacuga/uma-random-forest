@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
@@ -33,5 +35,5 @@ class Dataset(ABC):
     def clean(self) -> pd.DataFrame:
         pass
 
-    def split(self, test_size: float, random_state: int = None) -> 'tuple[np.array, np.array, np.array, np.array]':
+    def split(self, test_size: float, random_state: int = None) -> "tuple[np.array, np.array, np.array, np.array]":
         return train_test_split(self.data, self.labels, test_size=test_size, random_state=random_state)

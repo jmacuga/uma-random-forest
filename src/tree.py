@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import numpy as np
 from utils.tree import entropy_func
 from utils.types import Classifier

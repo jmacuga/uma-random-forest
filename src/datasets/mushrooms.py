@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import numpy as np
 from pandas.core.api import DataFrame as DataFrame
 from utils.types import Dataset
@@ -14,7 +16,7 @@ class MushroomDataset(Dataset):
             self.labels = mushroom.data.targets.iloc[:, 0]
         else:
             mushrooms = pd.read_csv(path, header=None)
-            self.data = mushrooms.iloc[:, label_id+1:]
+            self.data = mushrooms.iloc[:, label_id + 1 :]
             self.labels = mushrooms.iloc[:, label_id]
 
         self.features_map = {}

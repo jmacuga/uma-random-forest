@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import numpy as np
 from tree import RandomizedDecisionTreeClassifier, RandomizedTournamentDecisionTreeClassifier
 import logging

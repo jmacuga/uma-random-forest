@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 from datasets.mushrooms import MushroomDataset
 from random_forest import TournamentRandomForestClassifier
 from sklearn.metrics import confusion_matrix, accuracy_score

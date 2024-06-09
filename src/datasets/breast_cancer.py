@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import numpy as np
 from pandas.core.api import DataFrame as DataFrame
 from datasets.mushrooms import MushroomDataset, Dataset
@@ -10,7 +12,7 @@ class BreastCancerDataset(MushroomDataset):
 
     def __repr__(self):
         return f"BreastCancerDataset() with {len(self)} samples"
-    
+
     def to_numerical(self):
         self.features_map = {col: sorted(self.data[col].unique()) for col in self.data}
         self.labels, self.classes_map = pd.factorize(self.labels)

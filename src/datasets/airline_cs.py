@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import numpy as np
 from pandas.core.api import DataFrame as DataFrame
 from utils.types import Dataset

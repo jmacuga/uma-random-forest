@@ -1,3 +1,5 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 from datasets.mushrooms import MushroomDataset
 from tree import DecisionTreeClassifier
 from random_forest import RandomForestClassifier, TournamentRandomForestClassifier

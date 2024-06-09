@@ -1,9 +1,12 @@
+# Authors: Julia Macuga, Paulina Dąbrowska
+
 import numpy as np
 from itertools import product
 from .types import Classifier
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
 import pandas as pd
+
 
 def grid_search(
     param_grid: dict,
@@ -84,7 +87,7 @@ def grid_search(
             best_params = param_dict
 
     # if path is not None:
-        # save_results(results, path)
+    # save_results(results, path)
     return best_params, best_accuracy, results
 
 
@@ -100,5 +103,5 @@ def save_results(results: dict, path: str):
         Path to save the CSV file.
     """
     df = pd.DataFrame(results)
-    df.to_csv(path, mode='a', index=False)
+    df.to_csv(path, mode="a", index=False)
     return df
