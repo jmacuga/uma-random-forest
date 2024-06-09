@@ -17,5 +17,5 @@ class BreastCancerDataset(MushroomDataset):
 
     def clean(self) -> None:
         self.to_numerical()
-        self.data = np.array(self.data, dtype=int)
-        self.labels = np.array(self.labels, dtype=int)
+        self.data = np.array(self.data)
+        self.labels = np.array(self.labels)

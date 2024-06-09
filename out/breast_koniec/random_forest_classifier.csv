@@ -1,0 +1,2 @@
+n_trees,max_depth,max_split_values,max_features,accuracy,precision,recall,f1
+10,3,1000,5,0.956140350877193,0.9500185116623472,0.9812206572769954,0.9653575989782887
